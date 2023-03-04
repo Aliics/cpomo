@@ -1,7 +1,7 @@
 CC=gcc
 
 compile: clean build
-all: compile run
+all: compile install run
 
 clean:
 	rm -rf build/
@@ -12,3 +12,6 @@ build:
 
 run:
 	./build/cpomo
+
+install:
+	cp ./build/cpomo ~/.local/bin/
