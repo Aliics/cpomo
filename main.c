@@ -99,26 +99,12 @@ finish:
 
 int main(int argc, char **argv)
 {
-	// No arguments, use default settings (4x25)
-	long pomo_n = POMO_N;
-	long pomo_len_ms = POMO_LEN_MS;
-	long break_len_ms = BREAK_LEN_MS;
-
-	// First argument: Pomo count
-	// Second argument: Pomo length
-	// Third argument: Break length	
-	if (argc > 1)
-	{
-		pomo_n = argtol(argv[1]);
-	}
-	if (argc > 2)
-	{
-		pomo_len_ms = argtol(argv[2]) * 60 * 1000;
-	}
-	if (argc > 3)
-	{
-		break_len_ms = argtol(argv[3]) * 60 * 1000;
-	}
+	// First argument: Pomo count (default: 4)
+	// Second argument: Pomo length (default: 25 minutes)
+	// Third argument: Break length	(default: 5 minutes)
+	long pomo_n = argc > 1 ? argtol(argv[1]) : POMO_N;
+	long pomo_len_ms = argc > 2 ? argtol(argv[2]) * 60 * 1000 : POMO_LEN_MS;
+	long break_len_ms = argc > 3 ? argtol(argv[3]) * 60 * 1000 : BREAK_LEN_MS;
 
 	run_timer(pomo_n, pomo_len_ms, break_len_ms);
 
