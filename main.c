@@ -15,6 +15,14 @@ long get_time_ms()
 	return now.tv_sec * 1000 + now.tv_nsec / 1000000;
 }
 
+void print_str_center(char *str, int col_offset)
+{
+	int max_y, max_x;
+	getmaxyx(stdscr, max_y, max_x);
+
+	mvprintw(max_y / 2 + col_offset, max_x / 2 - strlen(str) / 2, str);
+}
+
 /*
  * run_timer runs until no more time is left in the pomo.
  */
@@ -25,6 +33,7 @@ void run_timer(long pomo_n,
 	// ncurses initialization
 	initscr();
 	keypad(stdscr, TRUE);
+	timeout(-1);
 	noecho();
 
 	long start_ms = get_time_ms(); 
@@ -41,40 +50,46 @@ void run_timer(long pomo_n,
 		long timer_len_ms = is_break ? break_len_ms : pomo_len_ms;
 		long remaining_ms = start_ms + timer_len_ms - get_time_ms();
 
-		int max_y, max_x;
-		getmaxyx(stdscr, max_y, max_x);
-
 		// 100ms
 		usleep(100000);
 
 		move(0, 0);
 		clrtobot();
 
+		char *timer_name = is_break ? BREAK_TXT : POMO_TXT;
+
 		if (remaining_ms <= 0)
 		{
 			// Prompt to start next timer.
-			mvprintw(max_y / 2, max_x / 2 - 17, "Timer's up! Start next timer? [Y/n]");
+			char restart_txt[64];
+			sprintf(restart_txt, "%s timer's up! Start next timer? [Y/n]", timer_name);
+			print_str_center(restart_txt, 0);
+			
 			char prompt_answer = getch();
 			if (prompt_answer == 'n' || prompt_answer == 'N')
 			{
 				goto finish;
 			}
 
-			pomo_i++;
+			if (!is_break)
+			{
+				pomo_i++;
+			}
 			is_break = !is_break;
 			start_ms = get_time_ms();
 		}
 
 		// Show timer status
-		char *timer_name = is_break ? BREAK_TXT : POMO_TXT;
-
-		char title[64];
+		char title[32];
 		sprintf(title, "%s %lu/%lu", timer_name, pomo_i, pomo_n);
-		mvprintw(max_y / 2, max_x / 2 - strlen(title) / 2, title);
+		print_str_center(title, 0);
 
 		long remaining_mn = remaining_ms / 60 / 1000 % 60;
 		long remaining_s = remaining_ms / 1000 % 60;
-		mvprintw(max_y / 2 + 1, max_x / 2 - 2, "%02lu:%02lu", remaining_mn, remaining_s);
+
+		char remaining_txt[6];
+		sprintf(remaining_txt, "%02lu:%02lu", remaining_mn, remaining_s);	
+		print_str_center(remaining_txt, 1);
 		refresh();
 	}
 
@@ -90,8 +105,8 @@ int main(int argc, char **argv)
 	long break_len_ms = BREAK_LEN_MS;
 
 	// First argument: Pomo count
-	// Second argument: Pomo length (optional)
-	// Third argument: Break length (optional)	
+	// Second argument: Pomo length
+	// Third argument: Break length	
 	if (argc > 1)
 	{
 		pomo_n = argtol(argv[1]);
