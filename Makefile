@@ -14,4 +14,4 @@ run:
 	./build/cpomo
 
 install:
-	cp ./build/cpomo ~/.local/bin/
+	cp ./build/cpomo ~/.local/bin/ || cp ./build/cpomo /usr/local/bin

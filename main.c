@@ -37,7 +37,7 @@ void run_timer(long pomo_n,
 	noecho();
 
 	long start_ms = get_time_ms(); 
-	long pomo_i = 0;
+	long pomo_i = 1;
 	bool is_break = false;
 
 	// When starting a timer (break or work):
@@ -45,7 +45,7 @@ void run_timer(long pomo_n,
 	//  - Elapse 100ms each tick
 	//  - If now > start + timer_length then flip timer -> prompt to continue
 	//  - Update display (timer type, and time remaining mm:ss)
-	while (pomo_i < pomo_n)
+	while (pomo_i <= pomo_n)
 	{
 		long timer_len_ms = is_break ? break_len_ms : pomo_len_ms;
 		long remaining_ms = start_ms + timer_len_ms - get_time_ms();
@@ -71,12 +71,13 @@ void run_timer(long pomo_n,
 				goto finish;
 			}
 
-			if (!is_break)
+			if (is_break)
 			{
 				pomo_i++;
 			}
 			is_break = !is_break;
 			start_ms = get_time_ms();
+			continue;
 		}
 
 		// Show timer status
